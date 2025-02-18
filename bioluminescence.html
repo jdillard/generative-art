@@ -3,12 +3,16 @@
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
-        body {
+        html, body {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background: #000000;
+        }
+        canvas {
+            display: block;
         }
     </style>
 </head>
@@ -19,20 +23,29 @@
         let amount = 1000;
         let timeOffset = 0;
         
-        // Arrays to store particle information
         let prevPositions = [];
         let glowIntensities = [];
         let velocities = [];
         
-        // Target percentage of particles that should glow
         const TARGET_GLOW_PERCENTAGE = 0.2;
         let velocityThreshold = 8;
         
         function setup() {
-            createCanvas(700, 700);
+            createCanvas(windowWidth, windowHeight);
             background('#000000');
+            initializeParticles();
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            initializeParticles();
+        }
+
+        function initializeParticles() {
+            prevPositions = [];
+            glowIntensities = [];
+            velocities = [];
             
-            // Initialize arrays for particle tracking
             let leeway = 500;
             for (let i = -leeway; i < width + leeway; i += w) {
                 for (let j = -leeway; j < height + leeway; j += w) {
@@ -44,19 +57,16 @@
         }
 
         function adjustVelocityThreshold() {
-            // Count glowing particles
             let glowingCount = glowIntensities.filter(g => g > 0).length;
             let totalParticles = glowIntensities.length;
             let currentPercentage = glowingCount / totalParticles;
             
-            // Adjust threshold based on difference from target
             if (currentPercentage > TARGET_GLOW_PERCENTAGE) {
-                velocityThreshold *= 1.01; // Gradually increase threshold
+                velocityThreshold *= 1.01;
             } else if (currentPercentage < TARGET_GLOW_PERCENTAGE * 0.8) {
-                velocityThreshold *= 0.99; // Gradually decrease threshold
+                velocityThreshold *= 0.99;
             }
             
-            // Keep threshold within reasonable bounds
             velocityThreshold = constrain(velocityThreshold, 4, 20);
         }
 
@@ -78,24 +88,19 @@
                     let n1 = noise(xoff, yoff);
                     let n2 = noise(xoff * 2, yoff * 2 + 1000);
                     
-                    // Create more natural movement patterns
                     let nx = i + (n1 * amount - amount/2);
                     let ny = j + (n2 * amount - amount/2);
                     
-                    // Add subtle wave motion
                     ny += sin(i * 0.02 + timeOffset * 3) * 15;
                     
-                    // Calculate velocity
                     let dx = nx - prevPositions[particleIndex].x;
                     let dy = ny - prevPositions[particleIndex].y;
                     let velocity = sqrt(dx*dx + dy*dy);
                     velocities[particleIndex] = velocity;
                     
-                    // Update previous position
                     prevPositions[particleIndex].x = nx;
                     prevPositions[particleIndex].y = ny;
                     
-                    // Update glow based on velocity and threshold
                     if (velocity > velocityThreshold) {
                         glowIntensities[particleIndex] = min(glowIntensities[particleIndex] + 0.5, 1);
                     } else {
@@ -105,17 +110,14 @@
                     let size = map(n1 * n2, 0, 1, 1, 3);
                     let alpha = map(ny, 0, height, 255, 100);
                     
-                    // Create bioluminescent glow effect
                     if (glowIntensities[particleIndex] > 0) {
-                        // Outer glow
                         fill(64, 220, 255, alpha * 0.2 * glowIntensities[particleIndex]);
                         circle(nx, ny, size * 3);
                         
-                        // Inner bright dot
                         fill(128, 255, 255, alpha * glowIntensities[particleIndex]);
                         circle(nx, ny, size);
                     } else {
-                        fill(255, alpha * 0.3); // Reduced base particle brightness
+                        fill(255, alpha * 0.3);
                         circle(nx, ny, size);
                     }
                     
@@ -123,7 +125,6 @@
                 }
             }
 
-            // Adjust threshold periodically
             if (frameCount % 30 === 0) {
                 adjustVelocityThreshold();
             }
