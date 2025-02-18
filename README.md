@@ -12,9 +12,13 @@ The gentle oscillation of the waves, rendered in real-time, ensures that no two 
 
 Medium: JavaScript, P5.js
 
-## baker [[view]](/baker.html)
+## _Digital Alpenglow_ (2025) [[view]](/baker.html)
 
-Represents Mount Baker
+The piece explores the tension between mathematical precision and natural randomness, using Perlin noise algorithms to generate organic mountainous forms while maintaining the artificial aesthetic of digital wireframes. As the landscape slowly rotates, it reveals new perspectives of its geometric poetry, suggesting both the permanence of mountains and the transient nature of light and perception.
+
+The color palette draws inspiration from the high-altitude phenomenon of alpenglow, translating this natural light effect into a digital space where the boundaries between synthetic and natural beauty blur.
+
+Medium: JavaScript, p5.js
 
 ## bioluminescence [[view]](/bioluminescence.html)
 
