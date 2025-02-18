@@ -30,9 +30,13 @@ The color palette transitions from warm coral pinks of young salmon to the deep 
 
 Like all generative art, each moment of this piece is unique and will never repeat exactly, creating an endless meditation on migration, transformation, and the rhythms of natural life.
 
-## ski [[view]](/ski.html)
+## _Infinite Descent_ (2025) [[view]](/ski.html)
 
-Represents skiiers on a hill side
+A meditation on the rhythmic patterns of winter sports, this piece captures the ephemeral traces left by skiers and snowboarders as they navigate an endless slope. The parallel lines of ski tracks weave their own unique stories - some cautious and measured, others bold and sweeping - while solitary snowboarders occasionally carve their way through the scene with distinctive, fluid movements.
+
+Each track is governed by its own personality, simulating the natural tendencies of different riders: some prefer wide, graceful turns while others take more direct paths downward. The trails fade like memories in the snow, only to be replaced by new patterns, creating an ever-evolving landscape of human movement.
+
+The piece draws inspiration from the temporary marks we leave in nature and the shared experience of winter sports, where no two runs are ever quite the same. As you watch, notice how the randomized behaviors create moments of both harmony and contrast between the various tracks, much like the organic flow of skiers and snowboarders sharing the mountain.
 
 ## sun-angle [[view]](/sun-angle.html)
 
