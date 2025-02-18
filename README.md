@@ -2,7 +2,7 @@
 
 A collection of generative art pieces created for the _Wire Garden_ installation.
 
-[WEBSITE](https://jdillard.github.io/generative-art/)
+[[WEBSITE]](https://jdillard.github.io/generative-art/) || [[CODE]](https://github.com/jdillard/generative-art)
 
 ## _Northern Lights in Mint_ (2025) [[view]](/aurora.html)
 
