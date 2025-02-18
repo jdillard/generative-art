@@ -5,10 +5,11 @@
     <style>
         body {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #ffffff;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
         }
     </style>
 </head>
@@ -98,7 +99,7 @@
         }
 
         function setup() {
-            createCanvas(800, 800);
+            createCanvas(windowWidth, windowHeight);
             background(250);
             
             // Create initial tracks
@@ -125,6 +126,12 @@
             }
             
             time += 0.01;
+        }
+
+        // Handle window resizing
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            background(250);
         }
     </script>
 </body>
