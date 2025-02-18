@@ -16,9 +16,13 @@ Represents Mount Baker
 
 Represents bioluminescence
 
-## rain [[view]](/rain.html)
+## _Digital Meditation_ (2025) [[view]](/rain.html)
 
-Represents rain at night
+In this contemplative piece, digital raindrops create ephemeral ripples across a boundless dark expanse, evoking the serene surface of a midnight puddle. Each ripple's gentle distortion and gradual fade mirrors the impermanent nature of moments in time, while the subtle distortions in the circular patterns suggest the organic imperfections found in nature.
+
+As generated ripples intersect and overlap, they create fleeting compositions that never repeat, ensuring each viewer's experience is unique and personal.
+
+Medium: JavaScript, P5.js
 
 ## _Salmon Run_ (2025) [[view]](/salmon.html)
 
@@ -30,6 +34,8 @@ The color palette transitions from warm coral pinks of young salmon to the deep 
 
 Like all generative art, each moment of this piece is unique and will never repeat exactly, creating an endless meditation on migration, transformation, and the rhythms of natural life.
 
+Medium: JavaScript, P5.js
+
 ## _Infinite Descent_ (2025) [[view]](/ski.html)
 
 A meditation on the rhythmic patterns of winter sports, this piece captures the ephemeral traces left by skiers and snowboarders as they navigate an endless slope. The parallel lines of ski tracks weave their own unique stories - some cautious and measured, others bold and sweeping - while solitary snowboarders occasionally carve their way through the scene with distinctive, fluid movements.
@@ -37,6 +43,8 @@ A meditation on the rhythmic patterns of winter sports, this piece captures the 
 Each track is governed by its own personality, simulating the natural tendencies of different riders: some prefer wide, graceful turns while others take more direct paths downward. The trails fade like memories in the snow, only to be replaced by new patterns, creating an ever-evolving landscape of human movement.
 
 The piece draws inspiration from the temporary marks we leave in nature and the shared experience of winter sports, where no two runs are ever quite the same. As you watch, notice how the randomized behaviors create moments of both harmony and contrast between the various tracks, much like the organic flow of skiers and snowboarders sharing the mountain.
+
+Medium: JavaScript, P5.js
 
 ## sun-angle [[view]](/sun-angle.html)
 
