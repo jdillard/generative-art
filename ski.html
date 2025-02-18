@@ -32,13 +32,36 @@
                 this.age = 0;
                 this.maxAge = random(200, 400);
                 this.width = random(3, 6);
-                this.spacing = random(15, 25); // Space between parallel lines
+                this.spacing = random(15, 25);
                 this.speed = random(3, 5);
+                
                 // Movement properties
-                this.velocity = random(2, 4);
-                this.angle = PI/2 + random(-0.2, 0.2);
+                this.velocity = random(3, 5);
+                this.angle = PI/2 + random(-0.6, 0.6);
                 this.angleVelocity = 0;
-                this.turnRadius = random(50, 150);
+                
+                // Increased turn characteristics
+                this.turnStyle = random();
+                this.turnFrequency = random(0.002, 0.015); // Increased frequency range
+                this.turnAmplitude = random(0.4, 1.2);     // Increased amplitude range
+                
+                // Random initial direction
+                this.preferredDirection = random() < 0.5 ? 
+                    random(-0.6, -0.2) :  // Left bias
+                    random(0.2, 0.6);     // Right bias
+                    
+                // Sine wave offset for organic movement
+                this.waveOffset = random(1000);
+                
+                // New property for dynamic turn radius
+                this.turnRadius = random(0.6, 1.2);
+            }
+
+            // Constrain an angle to ensure downward movement
+            constrainAngle(angle) {
+                const minAngle = PI/4;     // 45 degrees
+                const maxAngle = 3*PI/4;   // 135 degrees
+                return Math.max(minAngle, Math.min(maxAngle, angle));
             }
 
             update() {
@@ -46,12 +69,37 @@
                 this.x += cos(this.angle) * this.velocity;
                 this.y += sin(this.angle) * this.velocity;
 
-                // Create natural turning motion
-                let turnDesire = noise(this.x * 0.005, this.y * 0.005, time * 0.1) * TWO_PI;
-                let angleDiff = ((turnDesire - this.angle + PI) % TWO_PI) - PI;
-                this.angleVelocity += angleDiff * 0.001;
-                this.angleVelocity *= 0.95; // Damping
+                // Calculate turning based on individual style with increased waviness
+                let baseWave = sin((time * this.turnFrequency * 50) + this.waveOffset);
+                
+                let turnInfluence;
+                if (this.turnStyle < 0.2) {
+                    // Straight-line skier: minimal turning but still some waviness
+                    turnInfluence = baseWave * 0.15;
+                } else if (this.turnStyle < 0.5) {
+                    // Smooth, regular turns with increased amplitude
+                    turnInfluence = baseWave * this.turnAmplitude * 0.6;
+                } else if (this.turnStyle < 0.8) {
+                    // Wide, sweeping turns
+                    turnInfluence = baseWave * this.turnAmplitude * 0.8;
+                } else {
+                    // Dynamic, varied turns
+                    let noiseInfluence = noise(this.x * 0.003, this.y * 0.003, time * 0.1) - 0.5;
+                    turnInfluence = (baseWave * 0.7 + noiseInfluence) * this.turnAmplitude;
+                }
+
+                // Apply turn influence with increased magnitude
+                this.angleVelocity += turnInfluence * 0.025 * this.turnRadius;
+                this.angleVelocity *= 0.93; // Slightly reduced damping for more fluid turns
+                
+                // Update and constrain angle
                 this.angle += this.angleVelocity;
+                this.angle = this.constrainAngle(this.angle);
+
+                // Gentler bias towards preferred direction
+                let targetAngle = PI/2 + this.preferredDirection;
+                targetAngle = this.constrainAngle(targetAngle);
+                this.angle = lerp(this.angle, targetAngle, 0.01); // Reduced lerp factor
 
                 // Add current position to track
                 this.points.push({x: this.x, y: this.y, age: 0});
