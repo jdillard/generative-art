@@ -5,10 +5,11 @@
     <style>
         body {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000000;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
         }
     </style>
 </head>
@@ -21,14 +22,13 @@
                 this.x = x;
                 this.y = y;
                 this.rings = [];
-                this.numRings = 2; // Reduced from 3 to 2 rings
-                this.spacing = random(20, 30); // Increased spacing between rings
+                this.numRings = 2;
+                this.spacing = random(20, 30);
                 
-                // Create multiple rings with different properties
                 for (let i = 0; i < this.numRings; i++) {
                     this.rings.push({
                         radius: 0,
-                        speed: random(0.6, 1.2), // Reduced speed range
+                        speed: random(0.6, 1.2),
                         maxRadius: random(120, 170),
                         opacity: 255,
                         thickness: map(i, 0, this.numRings - 1, 3, 1)
@@ -39,19 +39,13 @@
             update() {
                 let alive = false;
                 
-                // Update each ring
                 for (let i = 0; i < this.rings.length; i++) {
                     let ring = this.rings[i];
                     
-                    // Delay the start of each subsequent ring
                     if (i === 0 || this.rings[i-1].radius > this.spacing) {
                         ring.radius += ring.speed;
-                        
-                        // Calculate opacity with a smoother fade
                         ring.opacity = map(ring.radius, 0, ring.maxRadius, 255, 0, true);
-                        
-                        // Add slight oscillation to the opacity
-                        ring.opacity *= 0.8 + 0.2 * sin(ring.radius * 0.08); // Slowed down oscillation
+                        ring.opacity *= 0.8 + 0.2 * sin(ring.radius * 0.08);
                         
                         if (ring.opacity > 0) alive = true;
                     }
@@ -61,7 +55,6 @@
             }
 
             draw() {
-                // Draw each ring with a slight blur effect
                 drawingContext.shadowBlur = 5;
                 drawingContext.shadowColor = 'rgba(255, 255, 255, 0.3)';
                 
@@ -71,12 +64,11 @@
                         stroke(255, ring.opacity);
                         strokeWeight(ring.thickness);
                         
-                        // Add slight distortion to the circle
                         beginShape();
                         for (let a = 0; a < TWO_PI; a += 0.1) {
                             let xoff = map(cos(a), -1, 1, 0, 0.5);
                             let yoff = map(sin(a), -1, 1, 0, 0.5);
-                            let r = ring.radius + noise(xoff, yoff, frameCount * 0.008) * 5; // Slowed down noise
+                            let r = ring.radius + noise(xoff, yoff, frameCount * 0.008) * 5;
                             let x = this.x + cos(a) * r;
                             let y = this.y + sin(a) * r;
                             curveVertex(x, y);
@@ -90,23 +82,23 @@
         }
 
         function setup() {
-            createCanvas(800, 800);
+            createCanvas(windowWidth, windowHeight);
             background(0);
             pixelDensity(1);
             noiseDetail(4, 0.5);
         }
 
         function draw() {
-            background(0, 25); // Slightly slower fade
-            
-            // Reduced frequency of random ripples
-            if (random() < 0.02) { // Reduced drop frequency
+            background(0, 25);
+
+            // frequency of random rain drops
+            if (random() < 0.02) {
                 let x = random(width);
                 let y = random(height);
                 ripples.push(new Ripple(x, y));
             }
-            
-            // Update and draw ripples
+
+            // update and draw ripples
             for (let i = ripples.length - 1; i >= 0; i--) {
                 if (!ripples[i].update()) {
                     ripples.splice(i, 1);
@@ -116,9 +108,14 @@
             }
         }
 
-        // Add mouse interaction
         function mousePressed() {
             ripples.push(new Ripple(mouseX, mouseY));
+        }
+
+        // Handle window resizing
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            background(0);
         }
     </script>
 </body>
