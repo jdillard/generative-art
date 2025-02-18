@@ -4,9 +4,13 @@ A collection of generative art pieces created for the _Wire Garden_ installation
 
 [WEBSITE](https://jdillard.github.io/generative-art/)
 
-## aurora [[view]](/aurora.html)
+## _Northern Lights in Mint_ (2025) [[view]](/aurora.html)
 
-Represents the Northern Lights
+Layers of undulating mint-green waves evoke the ethereal dance of the aurora borealis above a snow-covered landscape. Each wave moves with its own distinct rhythm, creating a hypnotic interplay of light and motion that speaks to the harmony found in natural phenomena.
+
+The gentle oscillation of the waves, rendered in real-time, ensures that no two moments are identical – much like the ever-changing patterns of the northern lights themselves. This work explores themes of perpetual motion, natural rhythms, and the delicate balance between chaos and order in natural systems.
+
+Medium: JavaScript, P5.js
 
 ## baker [[view]](/baker.html)
 
