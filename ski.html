@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let tracks = [];
+        let time = 0;
+
+        class SkiTrack {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                // Start from top of slope
+                this.x = random(width);
+                this.y = -20;
+                // Track properties
+                this.points = [];
+                this.age = 0;
+                this.maxAge = random(200, 400);
+                this.width = random(3, 6);
+                this.spacing = random(15, 25); // Space between parallel lines
+                this.speed = random(3, 5);
+                // Movement properties
+                this.velocity = random(2, 4);
+                this.angle = PI/2 + random(-0.2, 0.2);
+                this.angleVelocity = 0;
+                this.turnRadius = random(50, 150);
+            }
+
+            update() {
+                // Update position
+                this.x += cos(this.angle) * this.velocity;
+                this.y += sin(this.angle) * this.velocity;
+
+                // Create natural turning motion
+                let turnDesire = noise(this.x * 0.005, this.y * 0.005, time * 0.1) * TWO_PI;
+                let angleDiff = ((turnDesire - this.angle + PI) % TWO_PI) - PI;
+                this.angleVelocity += angleDiff * 0.001;
+                this.angleVelocity *= 0.95; // Damping
+                this.angle += this.angleVelocity;
+
+                // Add current position to track
+                this.points.push({x: this.x, y: this.y, age: 0});
+
+                // Age the track
+                this.age++;
+                for (let p of this.points) {
+                    p.age++;
+                }
+
+                // Remove old points
+                this.points = this.points.filter(p => p.age < this.maxAge);
+
+                // Reset if track is too old or off screen
+                if (this.y > height + 20 || this.x < -20 || this.x > width + 20) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                // Draw parallel ski tracks
+                for (let offset of [-this.spacing/2, this.spacing/2]) {
+                    beginShape();
+                    noFill();
+                    
+                    for (let i = 0; i < this.points.length; i++) {
+                        let p = this.points[i];
+                        // Calculate perpendicular offset for parallel tracks
+                        let angle = i < this.points.length - 1 
+                            ? atan2(this.points[i+1].y - p.y, this.points[i+1].x - p.x)
+                            : this.angle;
+                        let offsetX = cos(angle + PI/2) * offset;
+                        let offsetY = sin(angle + PI/2) * offset;
+                        
+                        // Calculate opacity based on age
+                        let alpha = map(p.age, 0, this.maxAge, 60, 0);
+                        stroke(100, 100, 100, alpha);
+                        strokeWeight(this.width);
+                        
+                        vertex(p.x + offsetX, p.y + offsetY);
+                    }
+                    endShape();
+                }
+            }
+        }
+
+        function setup() {
+            createCanvas(800, 800);
+            background(250);
+            
+            // Create initial tracks
+            for (let i = 0; i < 5; i++) {
+                tracks.push(new SkiTrack());
+            }
+        }
+
+        function draw() {
+            // Refresh background with slight fade
+            background(250, 20);
+            
+            // Add subtle snow texture
+            for (let i = 0; i < 10; i++) {
+                stroke(255);
+                strokeWeight(random(1, 2));
+                point(random(width), random(height));
+            }
+            
+            // Update and draw tracks
+            for (let track of tracks) {
+                track.update();
+                track.draw();
+            }
+            
+            time += 0.01;
+        }
+    </script>
+</body>
+</html>

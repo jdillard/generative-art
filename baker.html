@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mountain Terrain</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: rgb(25, 25, 35);
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let terrain = [];
+        let cols, rows;
+        const scl = 20;
+        let flying = 0;
+        let rotation = 0;
+
+        // Alpenglow-inspired color palette for lines
+        const colors = [
+            [40, 42, 54],     // Dark base (near black)
+            [86, 67, 104],    // Deep purple-gray
+            [191, 131, 170],  // Mauve/pink
+            [255, 175, 189],  // Soft pink
+            [255, 233, 235],  // Snow with slight pink tint
+            [255, 255, 255]   // Pure white snow
+        ];
+
+        const backgroundColor = [25, 25, 35];
+
+        function setup() {
+            createCanvas(800, 600, WEBGL);
+            cols = width / scl;
+            rows = height / scl;
+
+            // Initialize terrain grid
+            for (let x = 0; x < cols; x++) {
+                terrain[x] = [];
+                for (let y = 0; y < rows; y++) {
+                    terrain[x][y] = 0;
+                }
+            }
+        }
+
+        function draw() {
+            background(backgroundColor);
+            
+            // Basic ambient light for visibility
+            ambientLight(50);
+            
+            // Move and rotate camera
+            rotateX(PI/3);
+            rotateZ(rotation);
+            rotation += 0.005; // Slow rotation speed
+            translate(-width/2, -height/2);
+
+            // Generate terrain
+            let yoff = flying;
+            for (let y = 0; y < rows; y++) {
+                let xoff = 0;
+                for (let x = 0; x < cols; x++) {
+                    // Enhanced peak generation with sharper snow line
+                    let centerX = cols/2;
+                    let centerY = rows/2;
+                    let distance = dist(x, y, centerX, centerY);
+                    let peakHeight = map(distance, 0, cols/3, 300, 0);
+                    peakHeight = constrain(peakHeight, 0, 300);
+                    
+                    // Add more detailed noise for terrain variation
+                    let baseNoise = noise(xoff, yoff);
+                    let detailNoise = noise(xoff * 2, yoff * 2) * 0.5;
+                    terrain[x][y] = map(baseNoise + detailNoise, 0, 1.5, -100, 100) + peakHeight;
+                    
+                    xoff += 0.1;
+                }
+                yoff += 0.1;
+            }
+            flying -= 0.003;
+
+            // Draw terrain with solid background color and colored lines
+            for (let y = 0; y < rows - 1; y++) {
+                for (let x = 0; x < cols - 1; x++) {
+                    let h = terrain[x][y];
+                    
+                    // Map height to color
+                    let snowLine = 200;
+                    let colorIndex;
+                    
+                    if (h > snowLine) {
+                        colorIndex = map(h, snowLine, 350, 4, 5);
+                    } else {
+                        colorIndex = map(h, -100, snowLine, 0, 4);
+                    }
+                    
+                    colorIndex = constrain(colorIndex, 0, colors.length - 1);
+                    let index = floor(colorIndex);
+                    let blend = colorIndex - index;
+                    
+                    // Interpolate between colors for lines
+                    let lineColor;
+                    if (index < colors.length - 1) {
+                        let c1 = colors[index];
+                        let c2 = colors[index + 1];
+                        let r = lerp(c1[0], c2[0], blend);
+                        let g = lerp(c1[1], c2[1], blend);
+                        let b = lerp(c1[2], c2[2], blend);
+                        lineColor = color(r, g, b);
+                    } else {
+                        lineColor = color(colors[colors.length - 1]);
+                    }
+                    
+                    // Draw faces with background color
+                    fill(backgroundColor);
+                    stroke(lineColor);
+                    strokeWeight(1);
+                    
+                    // Draw terrain faces
+                    beginShape();
+                    vertex(x * scl, y * scl, terrain[x][y]);
+                    vertex((x + 1) * scl, y * scl, terrain[x + 1][y]);
+                    vertex((x + 1) * scl, (y + 1) * scl, terrain[x + 1][y + 1]);
+                    vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+                    endShape(CLOSE);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

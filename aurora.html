@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let waveGroups = [];
+        const numGroups = 5;
+        const linesPerGroup = 6;
+        
+        const colorGradient = [
+            [220, 255, 220], // Very light mint
+            [180, 235, 200],
+            [140, 215, 180],
+            [100, 195, 160],
+            [60, 175, 140],
+            [20, 155, 120]   // Very dark mint
+        ];
+
+        function setup() {
+            createCanvas(800, 600);
+            
+            // Initialize wave groups with more dramatic movement
+            for (let i = 0; i < numGroups; i++) {
+                let group = {
+                    baseY: (i * height/2) / numGroups,
+                    amplitude: random(45, 65),  // Increased amplitude range
+                    frequency: random(0.002, 0.003),  // Adjusted frequency for more dramatic waves
+                    speed: random(0.002, 0.003),
+                    offset: random(TWO_PI)
+                };
+                waveGroups.push(group);
+            }
+        }
+
+        function draw() {
+            background(20, 30, 40);
+            noFill();
+            strokeWeight(4);
+            
+            // Draw each wave group
+            for (let i = 0; i < waveGroups.length; i++) {
+                let group = waveGroups[i];
+                
+                // Draw multiple lines for each group
+                for (let j = 0; j < linesPerGroup; j++) {
+                    stroke(
+                        colorGradient[j][0],
+                        colorGradient[j][1],
+                        colorGradient[j][2],
+                        230
+                    );
+                    
+                    beginShape();
+                    for (let x = 0; x < width; x += 5) {
+                        let xOffset = (x * group.frequency);
+                        let yOffset = group.offset + frameCount * group.speed;
+                        // Added a secondary wave for more complex movement
+                        let y = group.baseY + (j * 8) + 
+                               sin(xOffset + yOffset) * group.amplitude +
+                               sin(xOffset * 2 + yOffset * 1.5) * (group.amplitude * 0.3);
+                        curveVertex(x, y);
+                    }
+                    endShape();
+                }
+            }
+
+            // Draw static snow landscape
+            fill(240);
+            noStroke();
+            beginShape();
+            vertex(0, height);
+            for (let x = 0; x < width; x += 20) {
+                let y = height - 150 + sin(x * 0.02) * 30;
+                vertex(x, y);
+            }
+            vertex(width, height);
+            endShape(CLOSE);
+        }
+    </script>
+</body>
+</html>
