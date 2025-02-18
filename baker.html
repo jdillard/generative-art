@@ -6,17 +6,27 @@
     <title>Mountain Terrain</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        body {
+            width: 100vw;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             background-color: rgb(25, 25, 35);
         }
+        
         canvas {
             display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
@@ -28,7 +38,6 @@
         let flying = 0;
         let rotation = 0;
 
-        // Alpenglow-inspired color palette for lines
         const colors = [
             [40, 42, 54],     // Dark base (near black)
             [86, 67, 104],    // Deep purple-gray
@@ -41,11 +50,21 @@
         const backgroundColor = [25, 25, 35];
 
         function setup() {
-            createCanvas(800, 600, WEBGL);
+            createCanvas(windowWidth, windowHeight, WEBGL);
+            updateTerrain();
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            updateTerrain();
+        }
+
+        function updateTerrain() {
             cols = width / scl;
             rows = height / scl;
 
-            // Initialize terrain grid
+            // Reset terrain grid
+            terrain = [];
             for (let x = 0; x < cols; x++) {
                 terrain[x] = [];
                 for (let y = 0; y < rows; y++) {
@@ -57,28 +76,23 @@
         function draw() {
             background(backgroundColor);
             
-            // Basic ambient light for visibility
             ambientLight(50);
             
-            // Move and rotate camera
             rotateX(PI/3);
             rotateZ(rotation);
-            rotation += 0.005; // Slow rotation speed
+            rotation += 0.005;
             translate(-width/2, -height/2);
 
-            // Generate terrain
             let yoff = flying;
             for (let y = 0; y < rows; y++) {
                 let xoff = 0;
                 for (let x = 0; x < cols; x++) {
-                    // Enhanced peak generation with sharper snow line
                     let centerX = cols/2;
                     let centerY = rows/2;
                     let distance = dist(x, y, centerX, centerY);
                     let peakHeight = map(distance, 0, cols/3, 300, 0);
                     peakHeight = constrain(peakHeight, 0, 300);
                     
-                    // Add more detailed noise for terrain variation
                     let baseNoise = noise(xoff, yoff);
                     let detailNoise = noise(xoff * 2, yoff * 2) * 0.5;
                     terrain[x][y] = map(baseNoise + detailNoise, 0, 1.5, -100, 100) + peakHeight;
@@ -89,12 +103,10 @@
             }
             flying -= 0.003;
 
-            // Draw terrain with solid background color and colored lines
             for (let y = 0; y < rows - 1; y++) {
                 for (let x = 0; x < cols - 1; x++) {
                     let h = terrain[x][y];
                     
-                    // Map height to color
                     let snowLine = 200;
                     let colorIndex;
                     
@@ -108,7 +120,6 @@
                     let index = floor(colorIndex);
                     let blend = colorIndex - index;
                     
-                    // Interpolate between colors for lines
                     let lineColor;
                     if (index < colors.length - 1) {
                         let c1 = colors[index];
@@ -121,12 +132,10 @@
                         lineColor = color(colors[colors.length - 1]);
                     }
                     
-                    // Draw faces with background color
                     fill(backgroundColor);
                     stroke(lineColor);
                     strokeWeight(1);
                     
-                    // Draw terrain faces
                     beginShape();
                     vertex(x * scl, y * scl, terrain[x][y]);
                     vertex((x + 1) * scl, y * scl, terrain[x + 1][y]);
