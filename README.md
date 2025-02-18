@@ -2,8 +2,6 @@
 
 A collection of generative art pieces
 
-[**[VIEW ALL]**](https://jdillard.github.io/generative-art/)
-
 ## aurora [[view]](/aurora.html)
 
 Represents the Northern Lights
