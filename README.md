@@ -1,6 +1,6 @@
-# generative-art
+# Generative Art
 
-A collection of generative art pieces.
+A collection of generative art pieces created for the _Wire Garden_ installation.
 
 [WEBSITE](https://jdillard.github.io/generative-art/)
 
