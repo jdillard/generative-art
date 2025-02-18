@@ -1,6 +1,8 @@
 # generative-art
 
-A collection of generative art pieces
+A collection of generative art pieces.
+
+[WEBSITE](https://jdillard.github.io/generative-art/)
 
 ## aurora [[view]](/aurora.html)
 
