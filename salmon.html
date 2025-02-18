@@ -188,17 +188,7 @@
                 fish.draw();
             }
 
-            noStroke();
-            fill(139, 69, 19, 50);
-            rect(0, 0, width, 50);
-            rect(0, height - 50, width, 50);
-            
-            fill(255, 100);
-            textSize(16);
-            textAlign(LEFT, TOP);
-            let stageText = lifecycleStage === 0 ? "Migration to Ocean" :
-                           lifecycleStage === 1 ? "Ocean Life" : "Returning to Spawn";
-            text(stageText, 20, 20);
+            // All labels removed
         }
     </script>
 </body>
