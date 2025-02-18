@@ -58,6 +58,10 @@ The piece draws inspiration from the temporary marks we leave in nature and the 
 
 Medium: JavaScript, P5.js
 
-## sun-angle [[view]](/sun-angle.html)
+## _Solar Choreography_ (2025) [[view]](/sun-angle.html)
 
-Represents Sun angles throughout the year
+This work explores the dance between Earth and Sun through an abstract visualization of solar paths across twelve months. The piece maps the Sun's changing trajectory at 40° latitude, creating orbital harmonics that mirror our planet's seasonal rhythms.
+
+The result is a meditation on time's cyclical nature and our position in space, rendered through mathematics but softened by elements of chance and continuous motion. The work exists in a perpetual state of becoming, never exactly repeating its pattern, much like the cosmic dance it represents.
+
+Medium: JavaScript, P5.js
