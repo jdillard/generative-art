@@ -20,9 +20,13 @@ The color palette draws inspiration from the high-altitude phenomenon of alpengl
 
 Medium: JavaScript, p5.js
 
-## bioluminescence [[view]](/bioluminescence.html)
+## _Luminescent Flow_ (2025) [[view]](/bioluminescence.html)
 
-Represents bioluminescence
+Inspired by the bioluminescent phenomena found in ocean environments, this piece explores the emergent patterns of collective motion and natural light. Thousands of particles move through a fluid noise field, their movements dictated by mathematical equations that mirror natural flow patterns. As particles accelerate through certain thresholds, they emit a soft cyan glow – reminiscent of how marine organisms illuminate in response to disturbance or movement.
+
+The subtle wave motions and particle behaviors create an atmosphere of meditative calm while hinting at the complex underlying systems that govern natural phenomena. As you observe, notice how individual particles contribute to larger flowing patterns, much like schools of fish or crowds of fireflies moving in unconscious harmony.
+
+Medium: JavaScript, p5.js
 
 ## _Digital Meditation_ (2025) [[view]](/rain.html)
 
