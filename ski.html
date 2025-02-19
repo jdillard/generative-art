@@ -21,27 +21,27 @@
         const MAX_SNOWBOARDERS = 2;
 
         class SnowboardTrack {
-            constructor() {
-                this.reset();
+            constructor(xPosition = null) {
+                this.reset(xPosition);
             }
 
-            reset() {
-                this.x = random(width);
+            reset(xPosition = null) {
+                // Spread out initial positions
+                this.x = xPosition || random(width * 0.1, width * 0.9);
                 this.y = -20;
                 this.points = [];
                 this.age = 0;
                 this.maxAge = random(300, 500);
                 this.width = random(8, 12);
                 this.velocity = random(4, 6);
-                this.angle = PI/2 + random(-0.6, 0.6);
-                this.angleVelocity = 0;
+                this.angle = PI/2 + random(-0.3, 0.3);
                 
-                this.turnFrequency = random(0.004, 0.008);
-                this.turnAmplitude = random(0.8, 1.2);
-                this.waveOffset = random(1000);
-                this.turnRadius = random(0.8, 1.4);
+                // Parameters for continuous turning
+                this.turnPhase = random(TWO_PI); // Random starting phase
+                this.turnDirection = random() < 0.5 ? -1 : 1;
+                this.turnSpeed = random(0.02, 0.04);
+                this.turnAmplitude = random(0.02, 0.04);
                 
-                // Track if this snowboarder should be removed
                 this.shouldRemove = false;
             }
 
@@ -55,13 +55,14 @@
                 this.x += cos(this.angle) * this.velocity;
                 this.y += sin(this.angle) * this.velocity;
 
-                let baseWave = sin((time * this.turnFrequency * 50) + this.waveOffset);
-                let turnInfluence = baseWave * this.turnAmplitude;
-
-                this.angleVelocity += turnInfluence * 0.03 * this.turnRadius;
-                this.angleVelocity *= 0.93;
+                this.turnPhase += this.turnSpeed;
+                let turn = sin(this.turnPhase) * this.turnAmplitude;
                 
-                this.angle += this.angleVelocity;
+                // Add noise for natural variation
+                let noiseValue = noise(this.x * 0.003, this.y * 0.003, time * 0.1) - 0.5;
+                turn += noiseValue * 0.01;
+
+                this.angle += turn * this.turnDirection;
                 this.angle = this.constrainAngle(this.angle);
 
                 this.points.push({x: this.x, y: this.y, age: 0});
@@ -73,7 +74,6 @@
 
                 this.points = this.points.filter(p => p.age < this.maxAge);
 
-                // Mark for removal if off screen
                 if (this.y > height + 20 || this.x < -20 || this.x > width + 20) {
                     this.shouldRemove = true;
                 }
@@ -95,34 +95,30 @@
         }
 
         class SkiTrack {
-            constructor() {
-                this.reset();
+            constructor(xPosition = null) {
+                this.reset(xPosition);
             }
 
-            reset() {
-                this.x = random(width);
+            reset(xPosition = null) {
+                // Spread out initial positions
+                this.x = xPosition || random(width * 0.1, width * 0.9);
                 this.y = -20;
                 this.points = [];
                 this.age = 0;
                 this.maxAge = random(200, 400);
                 this.width = random(3, 6);
                 this.spacing = random(15, 25);
-                this.speed = random(3, 5);
-                
                 this.velocity = random(3, 5);
-                this.angle = PI/2 + random(-0.6, 0.6);
-                this.angleVelocity = 0;
+                this.angle = PI/2 + random(-0.3, 0.3);
                 
-                this.turnStyle = random();
-                this.turnFrequency = random(0.002, 0.015);
-                this.turnAmplitude = random(0.4, 1.2);
+                // Parameters for continuous turning
+                this.turnPhase = random(TWO_PI); // Random starting phase
+                this.turnDirection = random() < 0.5 ? -1 : 1;
+                this.turnSpeed = random(0.015, 0.03);
+                this.turnAmplitude = random(0.015, 0.03);
                 
-                this.preferredDirection = random() < 0.5 ? 
-                    random(-0.6, -0.2) :
-                    random(0.2, 0.6);
-                    
-                this.waveOffset = random(1000);
-                this.turnRadius = random(0.6, 1.2);
+                // Greatly reduced center bias
+                this.centerBias = random(0.0002, 0.0004);
             }
 
             constrainAngle(angle) {
@@ -135,29 +131,20 @@
                 this.x += cos(this.angle) * this.velocity;
                 this.y += sin(this.angle) * this.velocity;
 
-                let baseWave = sin((time * this.turnFrequency * 50) + this.waveOffset);
+                this.turnPhase += this.turnSpeed;
+                let turn = sin(this.turnPhase) * this.turnAmplitude;
                 
-                let turnInfluence;
-                if (this.turnStyle < 0.2) {
-                    turnInfluence = baseWave * 0.15;
-                } else if (this.turnStyle < 0.5) {
-                    turnInfluence = baseWave * this.turnAmplitude * 0.6;
-                } else if (this.turnStyle < 0.8) {
-                    turnInfluence = baseWave * this.turnAmplitude * 0.8;
-                } else {
-                    let noiseInfluence = noise(this.x * 0.003, this.y * 0.003, time * 0.1) - 0.5;
-                    turnInfluence = (baseWave * 0.7 + noiseInfluence) * this.turnAmplitude;
+                let noiseValue = noise(this.x * 0.003, this.y * 0.003, time * 0.1) - 0.5;
+                turn += noiseValue * 0.01;
+
+                // Very subtle center pull only when near edges
+                if (this.x < width * 0.1 || this.x > width * 0.9) {
+                    let centerPull = (width/2 - this.x) * this.centerBias;
+                    turn += centerPull;
                 }
 
-                this.angleVelocity += turnInfluence * 0.025 * this.turnRadius;
-                this.angleVelocity *= 0.93;
-                
-                this.angle += this.angleVelocity;
+                this.angle += turn * this.turnDirection;
                 this.angle = this.constrainAngle(this.angle);
-
-                let targetAngle = PI/2 + this.preferredDirection;
-                targetAngle = this.constrainAngle(targetAngle);
-                this.angle = lerp(this.angle, targetAngle, 0.01);
 
                 this.points.push({x: this.x, y: this.y, age: 0});
 
@@ -201,49 +188,47 @@
             createCanvas(windowWidth, windowHeight);
             background(250);
             
-            // Create initial tracks
+            // Create initial tracks spread across the width
+            let spacing = width / 5;
             for (let i = 0; i < 5; i++) {
-                tracks.push(new SkiTrack());
+                let x = spacing * i + random(-spacing/4, spacing/4) + spacing/2;
+                tracks.push(new SkiTrack(x));
             }
             
-            // Start with random number of snowboarders (0 to 2)
+            // Spread out initial snowboarders
             let initialSnowboarders = floor(random(MAX_SNOWBOARDERS + 1));
             for (let i = 0; i < initialSnowboarders; i++) {
-                snowboarders.push(new SnowboardTrack());
+                let x = random(width * 0.1, width * 0.9);
+                snowboarders.push(new SnowboardTrack(x));
             }
         }
 
         function draw() {
             background(250, 20);
             
-            // Add subtle snow texture
             for (let i = 0; i < 10; i++) {
                 stroke(255);
                 strokeWeight(random(1, 2));
                 point(random(width), random(height));
             }
             
-            // Update and draw ski tracks
             for (let track of tracks) {
                 track.update();
                 track.draw();
             }
             
-            // Update and draw snowboarders
             for (let snowboarder of snowboarders) {
                 snowboarder.update();
                 snowboarder.draw();
             }
             
-            // Remove finished snowboarders
             snowboarders = snowboarders.filter(s => !s.shouldRemove);
             
-            // Randomly add new snowboarders with varying gaps
             if (snowboarders.length < MAX_SNOWBOARDERS) {
-                // More likely to add a snowboarder when there are none
                 let spawnChance = snowboarders.length === 0 ? 0.02 : 0.01;
                 if (random() < spawnChance) {
-                    snowboarders.push(new SnowboardTrack());
+                    // Spawn new snowboarders at random positions across width
+                    snowboarders.push(new SnowboardTrack(random(width * 0.1, width * 0.9)));
                 }
             }
             
