@@ -20,19 +20,105 @@
         let waveGroups = [];
         const numGroups = 5;
         const linesPerGroup = 6;
+        let trees = [];
+        const numTrees = 8; // Reduced for better spacing
         
         const colorGradient = [
-            [220, 255, 220], // Very light mint
+            [220, 255, 220],
             [180, 235, 200],
             [140, 215, 180],
             [100, 195, 160],
             [60, 175, 140],
-            [20, 155, 120]   // Very dark mint
+            [20, 155, 120]
         ];
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
             resetWaveGroups();
+            createTrees();
+        }
+
+        function isTreeTooClose(newX, existingTrees, minDistance) {
+            return existingTrees.some(tree => {
+                const distance = abs(newX - tree.x);
+                return distance < minDistance;
+            });
+        }
+
+        function createTrees() {
+            trees = [];
+            const minTreeSpacing = width * 0.12; // Minimum spacing between trees
+            
+            // Define specific positions across the width
+            const positions = [
+                { x: width * 0.15, depth: 0.85 },
+                { x: width * 0.3, depth: 0.6 },
+                { x: width * 0.45, depth: 0.7 },
+                { x: width * 0.6, depth: 0.5 },
+                { x: width * 0.75, depth: 0.65 },
+                { x: width * 0.85, depth: 0.8 }
+            ];
+
+            positions.forEach(pos => {
+                // Add some randomness to the planned positions
+                const x = pos.x + random(-width * 0.03, width * 0.03);
+                
+                // Only add the tree if it's not too close to existing trees
+                if (!isTreeTooClose(x, trees, minTreeSpacing)) {
+                    // Base height affected by depth
+                    const baseHeight = map(pos.depth, 0.5, 0.9, 140, 80);
+                    
+                    trees.push({
+                        x: x,
+                        y: height - (height * 0.15) + sin(x * 0.02) * (height * 0.03),
+                        height: baseHeight + random(-10, 10),
+                        swayOffset: random(TWO_PI),
+                        depth: pos.depth
+                    });
+                }
+            });
+        }
+
+        function drawTree(x, y, treeHeight, swayOffset, depth) {
+            push();
+            translate(x, y);
+            
+            // Adjust opacity based on depth
+            const opacity = map(depth, 0.5, 0.9, 255, 200);
+            
+            // Static trunk
+            stroke(101, 67, 33, opacity);
+            strokeWeight(map(depth, 0.5, 0.9, 6, 4));
+            line(0, 0, 0, -treeHeight * 0.3);
+            
+            // Tree sections with progressive sway
+            noStroke();
+            
+            // Draw multiple sections, with more sway at the top
+            for (let i = 0; i < 5; i++) {
+                let sectionHeight = treeHeight * (0.8 - i * 0.15);
+                let sectionWidth = treeHeight * 0.3 * (1 - i * 0.15);
+                let sectionY = -treeHeight * 0.3 - (i * sectionHeight * 0.25);
+                
+                // Increased sway amount for higher sections
+                let swayAmount = map(i, 0, 4, 0.05, 0.2);
+                let swayX = sin(frameCount * 0.015 + swayOffset) * (treeHeight * swayAmount);
+                
+                // Adjust green color based on depth
+                fill(34, 139, 34, opacity);
+                
+                // Draw triangular section
+                triangle(
+                    -sectionWidth + swayX,
+                    sectionY + sectionHeight * 0.5,
+                    sectionWidth + swayX,
+                    sectionY + sectionHeight * 0.5,
+                    0 + swayX,
+                    sectionY - sectionHeight * 0.2
+                );
+            }
+            
+            pop();
         }
 
         function resetWaveGroups() {
@@ -40,7 +126,7 @@
             for (let i = 0; i < numGroups; i++) {
                 let group = {
                     baseY: (i * windowHeight/2) / numGroups,
-                    amplitude: windowHeight * 0.075,  // Relative to window height
+                    amplitude: windowHeight * 0.075,
                     frequency: random(0.002, 0.003),
                     speed: random(0.002, 0.003),
                     offset: random(TWO_PI)
@@ -52,18 +138,17 @@
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
             resetWaveGroups();
+            createTrees();
         }
 
         function draw() {
             background(20, 30, 40);
+            
+            // Draw northern lights
             noFill();
             strokeWeight(4);
-            
-            // Draw each wave group
             for (let i = 0; i < waveGroups.length; i++) {
                 let group = waveGroups[i];
-                
-                // Draw multiple lines for each group
                 for (let j = 0; j < linesPerGroup; j++) {
                     stroke(
                         colorGradient[j][0],
@@ -76,7 +161,6 @@
                     for (let x = 0; x < width; x += 5) {
                         let xOffset = (x * group.frequency);
                         let yOffset = group.offset + frameCount * group.speed;
-                        // Added a secondary wave for more complex movement
                         let y = group.baseY + (j * windowHeight * 0.01) + 
                                sin(xOffset + yOffset) * group.amplitude +
                                sin(xOffset * 2 + yOffset * 1.5) * (group.amplitude * 0.3);
@@ -86,7 +170,7 @@
                 }
             }
 
-            // Draw static snow landscape
+            // Draw snow landscape
             fill(240);
             noStroke();
             beginShape();
@@ -97,6 +181,14 @@
             }
             vertex(width, height);
             endShape(CLOSE);
+            
+            // Sort trees by depth before drawing
+            trees.sort((a, b) => b.depth - a.depth);
+            
+            // Draw trees
+            trees.forEach(tree => {
+                drawTree(tree.x, tree.y, tree.height, tree.swayOffset, tree.depth);
+            });
         }
     </script>
 </body>
