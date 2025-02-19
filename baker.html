@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mountain Terrain</title>
+    <title>Mountain Terrain (Optimized)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         * {
@@ -34,67 +34,105 @@
     <script>
         let terrain = [];
         let cols, rows;
-        const scl = 20;
+        const scl = 30; // Increased scale for fewer vertices
         let flying = 0;
         let rotation = 0;
+        let graphics; // Off-screen buffer
 
         const colors = [
-            [40, 42, 54],     // Dark base (near black)
+            [40, 42, 54],     // Dark base
             [86, 67, 104],    // Deep purple-gray
             [191, 131, 170],  // Mauve/pink
             [255, 175, 189],  // Soft pink
-            [255, 233, 235],  // Snow with slight pink tint
-            [255, 255, 255]   // Pure white snow
+            [255, 233, 235],  // Snow with pink tint
+            [255, 255, 255]   // Pure white
         ];
 
         const backgroundColor = [25, 25, 35];
+        const colorCache = new Map(); // Cache for color calculations
 
         function setup() {
             createCanvas(windowWidth, windowHeight, WEBGL);
+            graphics = createGraphics(width, height, WEBGL);
+            frameRate(30); // Limit frame rate
             updateTerrain();
         }
 
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
+            graphics = createGraphics(width, height, WEBGL);
             updateTerrain();
         }
 
         function updateTerrain() {
-            cols = width / scl;
-            rows = height / scl;
+            cols = ceil(width / scl);
+            rows = ceil(height / scl);
 
-            // Reset terrain grid
-            terrain = [];
+            // Preallocate terrain array
+            terrain = new Array(cols);
             for (let x = 0; x < cols; x++) {
-                terrain[x] = [];
-                for (let y = 0; y < rows; y++) {
-                    terrain[x][y] = 0;
-                }
+                terrain[x] = new Array(rows).fill(0);
             }
+        }
+
+        function getColorForHeight(h) {
+            // Check cache first
+            const cacheKey = Math.floor(h * 10) / 10; // Round to 1 decimal for caching
+            if (colorCache.has(cacheKey)) {
+                return colorCache.get(cacheKey);
+            }
+
+            const snowLine = 200;
+            let colorIndex;
+            
+            if (h > snowLine) {
+                colorIndex = map(h, snowLine, 350, 4, 5);
+            } else {
+                colorIndex = map(h, -100, snowLine, 0, 4);
+            }
+            
+            colorIndex = constrain(colorIndex, 0, colors.length - 1);
+            const index = floor(colorIndex);
+            const blend = colorIndex - index;
+            
+            let lineColor;
+            if (index < colors.length - 1) {
+                const c1 = colors[index];
+                const c2 = colors[index + 1];
+                const r = lerp(c1[0], c2[0], blend);
+                const g = lerp(c1[1], c2[1], blend);
+                const b = lerp(c1[2], c2[2], blend);
+                lineColor = color(r, g, b);
+            } else {
+                lineColor = color(colors[colors.length - 1]);
+            }
+
+            // Store in cache
+            colorCache.set(cacheKey, lineColor);
+            return lineColor;
         }
 
         function draw() {
             background(backgroundColor);
-            
-            ambientLight(50);
             
             rotateX(PI/3);
             rotateZ(rotation);
             rotation += 0.005;
             translate(-width/2, -height/2);
 
+            // Update terrain heights
             let yoff = flying;
+            const centerX = cols/2;
+            const centerY = rows/2;
+            
             for (let y = 0; y < rows; y++) {
                 let xoff = 0;
                 for (let x = 0; x < cols; x++) {
-                    let centerX = cols/2;
-                    let centerY = rows/2;
-                    let distance = dist(x, y, centerX, centerY);
-                    let peakHeight = map(distance, 0, cols/3, 300, 0);
-                    peakHeight = constrain(peakHeight, 0, 300);
+                    const distance = dist(x, y, centerX, centerY);
+                    const peakHeight = constrain(map(distance, 0, cols/3, 300, 0), 0, 300);
                     
-                    let baseNoise = noise(xoff, yoff);
-                    let detailNoise = noise(xoff * 2, yoff * 2) * 0.5;
+                    const baseNoise = noise(xoff, yoff);
+                    const detailNoise = noise(xoff * 2, yoff * 2) * 0.5;
                     terrain[x][y] = map(baseNoise + detailNoise, 0, 1.5, -100, 100) + peakHeight;
                     
                     xoff += 0.1;
@@ -103,46 +141,21 @@
             }
             flying -= 0.003;
 
+            // Render terrain
             for (let y = 0; y < rows - 1; y++) {
-                for (let x = 0; x < cols - 1; x++) {
-                    let h = terrain[x][y];
+                beginShape(TRIANGLE_STRIP);
+                for (let x = 0; x < cols; x++) {
+                    const h1 = terrain[x][y];
+                    const h2 = terrain[x][y + 1];
                     
-                    let snowLine = 200;
-                    let colorIndex;
-                    
-                    if (h > snowLine) {
-                        colorIndex = map(h, snowLine, 350, 4, 5);
-                    } else {
-                        colorIndex = map(h, -100, snowLine, 0, 4);
-                    }
-                    
-                    colorIndex = constrain(colorIndex, 0, colors.length - 1);
-                    let index = floor(colorIndex);
-                    let blend = colorIndex - index;
-                    
-                    let lineColor;
-                    if (index < colors.length - 1) {
-                        let c1 = colors[index];
-                        let c2 = colors[index + 1];
-                        let r = lerp(c1[0], c2[0], blend);
-                        let g = lerp(c1[1], c2[1], blend);
-                        let b = lerp(c1[2], c2[2], blend);
-                        lineColor = color(r, g, b);
-                    } else {
-                        lineColor = color(colors[colors.length - 1]);
-                    }
-                    
-                    fill(backgroundColor);
-                    stroke(lineColor);
+                    stroke(getColorForHeight(h1));
                     strokeWeight(1);
+                    fill(backgroundColor);
                     
-                    beginShape();
-                    vertex(x * scl, y * scl, terrain[x][y]);
-                    vertex((x + 1) * scl, y * scl, terrain[x + 1][y]);
-                    vertex((x + 1) * scl, (y + 1) * scl, terrain[x + 1][y + 1]);
-                    vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
-                    endShape(CLOSE);
+                    vertex(x * scl, y * scl, h1);
+                    vertex(x * scl, (y + 1) * scl, h2);
                 }
+                endShape();
             }
         }
     </script>
