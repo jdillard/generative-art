@@ -33,9 +33,9 @@ The subtle wave motions and particle behaviors create an atmosphere of meditativ
 
 Medium: JavaScript, p5.js
 
-## _Digital Meditation_ (2025) [[view]](/rain.html)
+## _Midnight Puddle_ (2025) [[view]](/rain.html)
 
-In this contemplative piece, digital raindrops create ephemeral ripples across a boundless dark expanse, evoking the serene surface of a midnight puddle. Each ripple's gentle distortion and gradual fade mirrors the impermanent nature of moments in time, while the subtle distortions in the circular patterns suggest the organic imperfections found in nature.
+Digital raindrops create ephemeral ripplese, evoking the surface of a midnight puddle. Each ripple's gentle distortion and gradual fade mirrors the impermanent nature of moments in time, while the subtle distortions in the circular patterns suggest the organic imperfections found in nature.
 
 As generated ripples intersect and overlap, they create fleeting compositions that never repeat, ensuring each viewer's experience is unique and personal.
 
@@ -56,8 +56,6 @@ Medium: JavaScript, P5.js
 ## _Infinite Descent_ (2025) [[view]](/ski.html)
 
 A meditation on the rhythmic patterns of winter sports, this piece captures the ephemeral traces left by skiers and snowboarders as they navigate an endless slope. The parallel lines of ski tracks weave their own unique stories - some cautious and measured, others bold and sweeping - while solitary snowboarders occasionally carve their way through the scene with distinctive, fluid movements.
-
-Each track is governed by its own personality, simulating the natural tendencies of different riders: some prefer wide, graceful turns while others take more direct paths downward. The trails fade like memories in the snow, only to be replaced by new patterns, creating an ever-evolving landscape of human movement.
 
 The piece draws inspiration from the temporary marks we leave in nature and the shared experience of winter sports, where no two runs are ever quite the same. As you watch, notice how the randomized behaviors create moments of both harmony and contrast between the various tracks, much like the organic flow of skiers and snowboarders sharing the mountain.
 
