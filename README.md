@@ -49,7 +49,7 @@ The fluid dynamics are generated through algorithmic flow fields, creating organ
 
 Medium: JavaScript, P5.js
 
-## _Infinite Descent_ (2025) [[view]](/ski.html)
+## _Snowy Signatures_ (2025) [[view]](/ski.html)
 
 A meditation on the rhythmic patterns of winter sports, this piece captures the ephemeral traces left by skiers and snowboarders as they navigate an endless slope. The parallel lines of ski tracks weave their own unique stories - some cautious and measured, others bold and sweeping - while solitary snowboarders occasionally carve their way through the scene with distinctive, fluid movements.
 
