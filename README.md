@@ -47,10 +47,6 @@ Schools of salmon navigate an ever-shifting current, their journey reflecting th
 
 The fluid dynamics are generated through algorithmic flow fields, creating organic patterns that guide the fish through their celestial-like dance. Each salmon responds individually to these invisible currents while maintaining its own unique characteristics, mirroring the delicate balance between individual agency and collective movement found in nature.
 
-The color palette transitions from warm coral pinks of young salmon to the deep oceanic blues of their marine phase, finally shifting to rich spawning reds as they complete their cycle. This chromatic evolution serves as a visual metaphor for life's transformative stages, while the dark background suggests the mysterious depths of their watery world.
-
-Like all generative art, each moment of this piece is unique and will never repeat exactly, creating an endless meditation on migration, transformation, and the rhythms of natural life.
-
 Medium: JavaScript, P5.js
 
 ## _Infinite Descent_ (2025) [[view]](/ski.html)
