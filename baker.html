@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mountain Terrain (Optimized)</title>
+    <title>Mountain Terrain (Snow with Alpenglow)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         * {
@@ -34,10 +34,11 @@
     <script>
         let terrain = [];
         let cols, rows;
-        const scl = 30; // Increased scale for fewer vertices
+        const scl = 30;
         let flying = 0;
         let rotation = 0;
-        let graphics; // Off-screen buffer
+        let graphics;
+        let snowLineOffset = 0;
 
         const colors = [
             [40, 42, 54],     // Dark base
@@ -49,12 +50,13 @@
         ];
 
         const backgroundColor = [25, 25, 35];
-        const colorCache = new Map(); // Cache for color calculations
+        const snowColor = [225, 210, 220]; // More muted, dusty rose snow color
+        const colorCache = new Map();
 
         function setup() {
             createCanvas(windowWidth, windowHeight, WEBGL);
             graphics = createGraphics(width, height, WEBGL);
-            frameRate(30); // Limit frame rate
+            frameRate(30);
             updateTerrain();
         }
 
@@ -67,31 +69,21 @@
         function updateTerrain() {
             cols = ceil(width / scl);
             rows = ceil(height / scl);
-
-            // Preallocate terrain array
             terrain = new Array(cols);
             for (let x = 0; x < cols; x++) {
                 terrain[x] = new Array(rows).fill(0);
             }
         }
 
-        function getColorForHeight(h) {
-            // Check cache first
-            const cacheKey = Math.floor(h * 10) / 10; // Round to 1 decimal for caching
+        function getAlpenglowColor(h) {
+            const cacheKey = Math.floor(h * 10) / 10;
             if (colorCache.has(cacheKey)) {
                 return colorCache.get(cacheKey);
             }
 
-            const snowLine = 200;
-            let colorIndex;
-            
-            if (h > snowLine) {
-                colorIndex = map(h, snowLine, 350, 4, 5);
-            } else {
-                colorIndex = map(h, -100, snowLine, 0, 4);
-            }
-            
+            let colorIndex = map(h, -100, 350, 0, colors.length - 1);
             colorIndex = constrain(colorIndex, 0, colors.length - 1);
+            
             const index = floor(colorIndex);
             const blend = colorIndex - index;
             
@@ -107,7 +99,6 @@
                 lineColor = color(colors[colors.length - 1]);
             }
 
-            // Store in cache
             colorCache.set(cacheKey, lineColor);
             return lineColor;
         }
@@ -120,7 +111,12 @@
             rotation += 0.005;
             translate(-width/2, -height/2);
 
-            // Update terrain heights
+            // Update snow line animation
+            snowLineOffset += 0.02;
+            const baseSnowLine = 150;
+            const snowLineAmplitude = 70;
+            const snowLine = baseSnowLine + sin(snowLineOffset) * snowLineAmplitude;
+
             let yoff = flying;
             const centerX = cols/2;
             const centerY = rows/2;
@@ -129,11 +125,11 @@
                 let xoff = 0;
                 for (let x = 0; x < cols; x++) {
                     const distance = dist(x, y, centerX, centerY);
-                    const peakHeight = constrain(map(distance, 0, cols/3, 300, 0), 0, 300);
+                    const peakHeight = constrain(map(distance, 0, cols/3, 350, 0), 0, 350);
                     
                     const baseNoise = noise(xoff, yoff);
                     const detailNoise = noise(xoff * 2, yoff * 2) * 0.5;
-                    terrain[x][y] = map(baseNoise + detailNoise, 0, 1.5, -100, 100) + peakHeight;
+                    terrain[x][y] = map(baseNoise + detailNoise, 0, 1.5, -100, 150) + peakHeight;
                     
                     xoff += 0.1;
                 }
@@ -141,16 +137,24 @@
             }
             flying -= 0.003;
 
-            // Render terrain
             for (let y = 0; y < rows - 1; y++) {
                 beginShape(TRIANGLE_STRIP);
                 for (let x = 0; x < cols; x++) {
                     const h1 = terrain[x][y];
                     const h2 = terrain[x][y + 1];
                     
-                    stroke(getColorForHeight(h1));
+                    // Always use alpenglow color for stroke
+                    stroke(getAlpenglowColor(h1));
                     strokeWeight(1);
-                    fill(backgroundColor);
+                    
+                    // Use snow fill above snow line, background color below
+                    if (h1 > snowLine) {
+                        const snowFill = color(snowColor);
+                        snowFill.setAlpha(180); // More transparent snow
+                        fill(snowFill);
+                    } else {
+                        fill(backgroundColor);
+                    }
                     
                     vertex(x * scl, y * scl, h1);
                     vertex(x * scl, (y + 1) * scl, h2);
