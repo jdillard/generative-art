@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
+    </style>
+</head>
+<body>
+    <script>
+        let branches = [];
+        let blossoms = [];
+        let fallingBlossoms = [];
+        let time = 0;
+        let noiseScale = 0.003;
+        let phase = 'blooming'; // 'blooming' or 'falling'
+        let transitionStarted = false;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            // Create organic branch structure using noise
+            for (let i = 0; i < 15; i++) {
+                let branch = {
+                    points: [],
+                    thickness: random(2, 4),
+                    offset: random(1000)
+                };
+                
+                let x = random(width);
+                let y = random(height);
+                for (let j = 0; j < 50; j++) {
+                    branch.points.push(createVector(x, y));
+                    let angle = noise(x * noiseScale, y * noiseScale, branch.offset) * TWO_PI * 2;
+                    x += cos(angle) * 20;
+                    y += sin(angle) * 20;
+                }
+                branches.push(branch);
+            }
+        }
+
+        function draw() {
+            background(20, 10, 30, 10);
+            time += 0.005;
+
+            // Draw branches
+            branches.forEach(branch => {
+                noFill();
+                stroke(101, 67, 33, 70);
+                strokeWeight(branch.thickness);
+                beginShape();
+                branch.points.forEach(point => {
+                    let offset = noise(point.x * noiseScale, point.y * noiseScale, time) * 10;
+                    vertex(
+                        point.x + cos(time + offset) * 1,
+                        point.y + sin(time + offset) * 1
+                    );
+                });
+                endShape();
+            });
+
+            if (phase === 'blooming') {
+                // Add new blossoms during blooming phase
+                if (blossoms.length < 400 && frameCount % 3 === 0) {
+                    let branch = random(branches);
+                    let point = random(branch.points);
+                    blossoms.push({
+                        pos: createVector(point.x, point.y),
+                        originalPos: createVector(point.x, point.y),
+                        size: random(4, 12),
+                        angle: random(TWO_PI),
+                        speed: random(0.2, 0.5),
+                        offset: random(1000),
+                        alpha: 0, // Start transparent
+                        targetAlpha: random(180, 255),
+                        growing: true
+                    });
+                }
+
+                // Check if we should transition to falling phase
+                if (!transitionStarted && blossoms.length >= 400) {
+                    transitionStarted = true;
+                    setTimeout(() => {
+                        phase = 'falling';
+                    }, 5000); // Wait 5 seconds at full bloom
+                }
+            }
+
+            // Update and draw blossoms
+            for (let i = blossoms.length - 1; i >= 0; i--) {
+                let blossom = blossoms[i];
+                
+                // Fade in during growing phase
+                if (blossom.growing) {
+                    blossom.alpha = lerp(blossom.alpha, blossom.targetAlpha, 0.1);
+                }
+
+                // Gentle movement around original position
+                let noiseVal = noise(
+                    blossom.originalPos.x * noiseScale, 
+                    blossom.originalPos.y * noiseScale, 
+                    time + blossom.offset
+                );
+                
+                blossom.pos.x = blossom.originalPos.x + cos(time * blossom.speed + noiseVal * TWO_PI) * 15;
+                blossom.pos.y = blossom.originalPos.y + sin(time * blossom.speed + noiseVal * TWO_PI) * 15;
+
+                // Start falling if in falling phase
+                if (phase === 'falling' && random() < 0.01) {
+                    fallingBlossoms.push({
+                        ...blossom,
+                        vel: createVector(random(-1, 1), random(0.5, 2)),
+                        rotationSpeed: random(-0.05, 0.05)
+                    });
+                    blossoms.splice(i, 1);
+                    continue;
+                }
+
+                drawBlossom(blossom);
+            }
+
+            // Update and draw falling blossoms
+            for (let i = fallingBlossoms.length - 1; i >= 0; i--) {
+                let blossom = fallingBlossoms[i];
+                
+                // Update position
+                blossom.vel.x += sin(time) * 0.05; // Wind effect
+                blossom.pos.add(blossom.vel);
+                blossom.angle += blossom.rotationSpeed;
+                blossom.alpha = lerp(blossom.alpha, 0, 0.02); // Fade out
+
+                // Remove if off screen or fully transparent
+                if (blossom.pos.y > height || blossom.pos.x < 0 || 
+                    blossom.pos.x > width || blossom.alpha < 5) {
+                    fallingBlossoms.splice(i, 1);
+                    continue;
+                }
+
+                drawBlossom(blossom);
+            }
+
+            // Restart cycle if all blossoms are gone
+            if (phase === 'falling' && blossoms.length === 0 && 
+                fallingBlossoms.length === 0) {
+                phase = 'blooming';
+                transitionStarted = false;
+            }
+        }
+
+        function drawBlossom(blossom) {
+            push();
+            translate(blossom.pos.x, blossom.pos.y);
+            rotate(blossom.angle);
+            
+            // Draw petals
+            noStroke();
+            fill(255, 223, 236, blossom.alpha);
+            for (let j = 0; j < 5; j++) {
+                rotate(TWO_PI / 5);
+                ellipse(blossom.size/2, 0, blossom.size, blossom.size/2);
+            }
+            
+            // Draw center
+            fill(255, 233, 0, blossom.alpha);
+            ellipse(0, 0, blossom.size/3, blossom.size/3);
+            pop();
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
