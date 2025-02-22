@@ -64,3 +64,11 @@ This work explores the dance between Earth and Sun through an abstract visualiza
 The result is a meditation on time's cyclical nature and our position in space, rendered through mathematics but softened by elements of chance and continuous motion. The work exists in a perpetual state of becoming, never exactly repeating its pattern, much like the cosmic dance it represents.
 
 Medium: JavaScript, P5.js
+
+## _Cherry Blossoms_ (2025) [[view]](/cherry-blossom.html)
+
+The piece cycles through two contemplative phases: first, a gradual awakening as hundreds of pink blooms materialize and gently sway in place, creating a living tapestry. Then, as if responding to an unseen autumn wind, the blossoms release their hold and drift away into darkness, leaving space for the cycle to begin anew.
+
+This work explores themes of impermanence and renewal through the lens of Japanese hanami (花見) traditions, while abstracting the familiar cherry blossom viewing experience into a perspective that challenges our usual relationship with these fleeting natural phenomena.
+
+Medium: JavaScript, P5.js
