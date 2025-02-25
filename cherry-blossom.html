@@ -10,11 +10,13 @@
     <script>
         let branches = [];
         let blossoms = [];
-        let fallingBlossoms = [];
+        let matrixColumns = [];
         let time = 0;
         let noiseScale = 0.003;
         let phase = 'blooming'; // 'blooming' or 'falling'
         let transitionStarted = false;
+        let possibleChars = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890";
+        let charSize = 18; // Character size for columns
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
@@ -104,13 +106,31 @@
                 blossom.pos.x = blossom.originalPos.x + cos(time * blossom.speed + noiseVal * TWO_PI) * 15;
                 blossom.pos.y = blossom.originalPos.y + sin(time * blossom.speed + noiseVal * TWO_PI) * 15;
 
-                // Start falling if in falling phase
+                // Start falling as matrix characters if in falling phase
                 if (phase === 'falling' && random() < 0.01) {
-                    fallingBlossoms.push({
-                        ...blossom,
-                        vel: createVector(random(-1, 1), random(0.5, 2)),
-                        rotationSpeed: random(-0.05, 0.05)
-                    });
+                    // Round x position to create aligned columns based on character size
+                    let columnX = Math.round(blossom.pos.x / charSize) * charSize;
+                    // Get y position of the blossom
+                    let startY = Math.round(blossom.pos.y / charSize) * charSize;
+                    
+                    // Check if this column already exists at this X position
+                    let existingColumn = matrixColumns.find(col => col.x === columnX);
+                    
+                    if (!existingColumn) {
+                        // Create a new column at this x position starting from the blossom
+                        matrixColumns.push({
+                            x: columnX,
+                            y: startY, // Starting y position from the blossom
+                            characters: [],
+                            speed: random(2, 5),
+                            startTime: frameCount,
+                            // Use the original matrix colors from your uploaded file
+                            color: color(255, 223, 236, blossom.alpha),
+                            headColor: color(255, 223, 236, blossom.alpha),
+                            length: random(5, 20) // Number of characters in column
+                        });
+                    }
+                    
                     blossoms.splice(i, 1);
                     continue;
                 }
@@ -118,29 +138,69 @@
                 drawBlossom(blossom);
             }
 
-            // Update and draw falling blossoms
-            for (let i = fallingBlossoms.length - 1; i >= 0; i--) {
-                let blossom = fallingBlossoms[i];
+            // Update and draw matrix columns
+            for (let i = matrixColumns.length - 1; i >= 0; i--) {
+                let column = matrixColumns[i];
                 
-                // Update position
-                blossom.vel.x += sin(time) * 0.05; // Wind effect
-                blossom.pos.add(blossom.vel);
-                blossom.angle += blossom.rotationSpeed;
-                blossom.alpha = lerp(blossom.alpha, 0, 0.02); // Fade out
-
-                // Remove if off screen or fully transparent
-                if (blossom.pos.y > height || blossom.pos.x < 0 || 
-                    blossom.pos.x > width || blossom.alpha < 5) {
-                    fallingBlossoms.splice(i, 1);
-                    continue;
+                // Calculate how much the column has moved since creation
+                let elapsedTime = frameCount - column.startTime;
+                let distanceMoved = Math.floor(elapsedTime * column.speed / charSize) * charSize;
+                
+                // The y position of the first (head) character, starting from the blossom position
+                let headPos = column.y + distanceMoved;
+                
+                // If the head is within the canvas, continue to add characters to this column
+                if (headPos < height + charSize) {
+                    textSize(charSize);
+                    textAlign(CENTER, CENTER);
+                    textFont('monospace'); // For better spacing
+                    
+                    // Draw the stream of characters
+                    for (let j = 0; j < column.length; j++) {
+                        let y = headPos - (j * charSize);
+                        
+                        // Skip if this character would be above the blossom's original position
+                        if (y < column.y) continue;
+                        if (y > height) continue; // Skip if below canvas
+                        
+                        // Get or generate a character for this position
+                        let charIndex = Math.floor(distanceMoved/charSize - j);
+                        if (!column.characters[charIndex]) {
+                            column.characters[charIndex] = possibleChars.charAt(floor(random(possibleChars.length)));
+                            // Occasionally change characters
+                            if (random() < 0.1) {
+                                for (let k = 0; k < charIndex; k++) {
+                                    if (column.characters[k] && random() < 0.3) {
+                                        column.characters[k] = possibleChars.charAt(floor(random(possibleChars.length)));
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Calculate alpha based on position in stream (fade out toward the end of the trail)
+                        let alpha = map(j, 0, column.length, 255, 0);
+                        
+                        // First character is brightest (the head)
+                        if (j === 0) {
+                            fill(column.headColor);
+                        } else {
+                            // Others fade based on position
+                            let c = color(column.color);
+                            c.setAlpha(alpha);
+                            fill(c);
+                        }
+                        
+                        text(column.characters[charIndex], column.x, y);
+                    }
+                } else {
+                    // Remove column when it's fully off screen
+                    matrixColumns.splice(i, 1);
                 }
-
-                drawBlossom(blossom);
             }
 
-            // Restart cycle if all blossoms are gone
+            // Restart cycle if all elements are gone
             if (phase === 'falling' && blossoms.length === 0 && 
-                fallingBlossoms.length === 0) {
+                matrixColumns.length === 0) {
                 phase = 'blooming';
                 transitionStarted = false;
             }
