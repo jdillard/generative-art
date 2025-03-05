@@ -2,12 +2,14 @@
 
 [[WEBSITE]](https://jdillard.github.io/generative-art/) || [[CODE]](https://github.com/jdillard/generative-art)
 
+> [!NOTE]
+>  Proposal not accepted, and all works were a work in progress.
+
 A collection of generative art pieces created for the _Wire Garden_ installation.
 
 > Wire Garden is an immersive generative art gallery that blends technology and nature, offering a tranquil space for reflection.
 > Visitors step into a serene environment where large digital displays,decorated with plants, pulse with animated art responding to Bellingham’s weather and environmental data.
 > Soft natural soundscapes, comfortable seating, and reactive lighting
-
 
 ## _Northern Lights in Mint_ (2025) [[view]](/aurora.html)
 
