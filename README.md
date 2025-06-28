@@ -5,7 +5,7 @@
 > [!NOTE]
 >  Proposal not accepted, and all works were a work in progress.
 
-A collection of generative art pieces created for the _Wire Garden_ installation.
+A collection of generative art pieces created for the 2025 _Wire Garden_ installation proposal.
 
 > Wire Garden is an immersive generative art gallery that blends technology and nature, offering a tranquil space for reflection.
 > Visitors step into a serene environment where large digital displays,decorated with plants, pulse with animated art responding to Bellingham’s weather and environmental data.
